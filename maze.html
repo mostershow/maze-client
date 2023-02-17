@@ -1,0 +1,153 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Language" content="zh-CN">
+  <title>迷宫 - 三思</title>
+  <style type="text/css">
+    @import url(css/mg.css);
+  </style>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery.hotkey.js"></script>
+  <script type="text/javascript" src="js/mg.js"></script>
+  <script type="text/javascript" src="js/msg.js"></script>
+
+  <script src="ws/js/ionic.bundle.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/md5.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/long.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/bytebuffer.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/protobuf.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/BaseData.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/aes.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/asmcrypto.js" type="text/javascript" charset="utf-8"></script>
+  <!-- <script src="ws/js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script> -->
+  <script src="ws/js/DataEncrypt.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/EventMgr.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/WebSocketMgr.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ws/js/Login.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body id="sansi-toy-mg">
+  <div id="wrapper">
+
+    <div class="info">
+      当前总第
+      <span id="count" class="num">-</span> 局
+      <p>规则：从左上角出发，终点为右下角红旗处。</p>
+    </div>
+    <div id="mg" class="mg"></div>
+    <div id="mg2" class="mg"></div>
+    <div class="info">
+      <p>提示：您可以使用键盘上的上、下、左、右方向键控制迷宫中笑脸的移动。</p>
+    </div>
+    <div id="mg_set">
+      <strong>设置：</strong>
+      <p> <input type="checkbox" onclick="mark(1, this);" id="mark1"> <label for="mark1">将走过的格子用红色标出</label> </p> 宽：
+      <input type="text" id="mg_width" value="5" size="4" maxlength="3"> 高：
+      <input type="text" id="mg_height" value="5" size="4" maxlength="3">
+      用户ID<input type="text" id="user_id">
+      房间ID<input type="text" id="room_id">
+      <input type="button" value=" 生成新迷宫 " onclick="new_mg();">
+    </div>
+
+  </div>
+
+  <script type="text/javascript">
+    async function new_mg_mine(maze) {
+      var w = parseInt(document.getElementById("mg_width").value) || 5,
+        h = parseInt(document.getElementById("mg_height").value) || 5;
+      var userId = document.getElementById("user_id").value || getQueryString("userId") || randomString(10);
+      var roomId = document.getElementById("room_id").value || getQueryString("roomId") || randomString(10);
+      conn(userId, roomId);
+      await maze.set({ width: w, height: h, userId: userId, roomId: roomId }).create();
+      console.log(maze.grids);
+      console.log(maze.userId);
+      maze.is_mine = true;
+      await maze.show();
+      document.getElementById("mg_width").value = w;
+      document.getElementById("mg_height").value = h;
+      document.getElementById("room_id").value = roomId;
+      document.getElementById("user_id").value = userId;
+      //	count();
+    }
+
+    function getQueryString(name) {
+      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) {
+        return unescape(r[2]);
+      }
+      return null;
+    }
+    // async function new_mg_other(maze) {
+    //   var w = parseInt(document.getElementById("mg_width").value) || 5,
+    //   h = parseInt(document.getElementById("mg_height").value) || 5;
+
+    //   await maze.set({ width: w, height: h }).create();
+    //   console.log(maze.grids)
+    //   maze.is_mine=false;
+    //   await maze.show();
+    //   document.getElementById("mg_width").value = w;
+    //   document.getElementById("mg_height").value = h;
+    //   //	count();
+    // }
+    async function getOtherMaze(maze) {
+      var userId = document.getElementById("user_id").value;
+      if (maze.mg.userId !== userId) {
+        mg2.w = maze.mg.width;
+        mg2.h = maze.mg.height;
+        mg2.is_mine = false;
+        mg2.grids = maze.mg.grids;
+        console.log(mg2);
+        await mg2.show();
+      }
+    }
+    function otherMazeMove(p) {
+      mg2.me.moveTo(p);
+    }
+    function count() {
+      $.get("/count/maze/", {
+        r: Math.random()
+      }, function (r) {
+        r = r.replace(/[\r\n\s]/g, "");
+        if (r.match(/^\d+$/))
+          $("#count").html(r);
+      });
+    }
+    var maze = new MG("mg");
+    var mg2 = new MG("mg2");
+    function new_mg() {
+
+      new_mg_mine(maze);
+      // new_mg_other(mg2);
+    }
+    new_mg();
+    function mark(h, ob) {
+      maze.me.setMark(h, ob.checked);
+    }
+
+    // var maze = new MG("mg");
+    // var mg2 = new MG("mg2");
+    // new_mg_mine(maze);
+    // new_mg_other(mg2);
+
+
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="js/mg.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-9FPG9M4CQD');
+  </script>
+  <script type="text/javascript">
+    var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe99baf24f819fcd0a35adeec04e55b97' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+@font-face {
+    font-family: "Rustswordsblack";
+    font-weight: normal;
+    font-style: normal;
+    src: url("../fonts/rustswordsblack-webfont.woff") format("woff"),
+    url("../fonts/rustswordsblack%20.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Pypats";
+    font-weight: normal;
+    font-style: normal;
+    src: url("../fonts2/pypats-webfont.woff") format("woff"),
+        url("../fonts2/Pypats.ttf") format("truetype");
+}
+

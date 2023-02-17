@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Happy Maze</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/modernizr.js"></script>
+    <script src="js/loader.js"></script>
+    <link rel="stylesheet" href="css/fontfaces.css">
+
+</head>
+<body>
+   <div id="game">
+       <div class="screen" id="splash-screen">
+           <h1 class="logo">Happy <br/>Maze</h1>
+           <span>Click to continue</span>
+       </div>
+
+       <div class="screen" id="main-menu">
+           <h2 class="logo">Happy <br/>Maze</h2>
+           
+           <ul class="menu">
+            <input class="roomId" id="userId" type="text" placeholder="请输入玩家ID进行匹配">
+            <input class="roomId" id="roomId" type="text" placeholder="请输入房间ID进行匹配">
+               <li><button name="game-screen" onclick="aa()">Play</button>
+               <!-- <li><button name="hiscore">Highscore</button> -->
+               <li><button name="about">About</button>
+               <!-- <li><button name="exit-screen">Exit</button> -->
+           </ul>
+       </div>
+
+       <div class="screen" id="game-screen"></div>
+       <div class="screen" id="high-scores"></div>
+
+   </div>
+</body>
+<script>
+    function aa(){
+        var userId = document.getElementById("userId").value;
+        var roomId = document.getElementById("roomId").value;
+        window.location.href = "./maze.html?roomId="+roomId+"&userId="+userId;
+    }
+</script>
+</html>
