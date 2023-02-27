@@ -23,4 +23,4 @@ sudo /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args -allo
 ````
 打开google浏览器即可正常访问
 
-对应服务端见：(maze-server)[]
+对应服务端见：[maze-server](https://github.com/whrsss/maze-client)
