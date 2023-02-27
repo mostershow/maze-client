@@ -1,6 +1,6 @@
 (function($) {
 	jQuery.WebSocketMgr = function() {
-		const serverUrl = 'ws://localhost:10031';
+		const serverUrl = 'ws://localhost:10035';
 		// 定义一个结构体
 		const wsConnection = {};
 		wsConnection.logined = false;
